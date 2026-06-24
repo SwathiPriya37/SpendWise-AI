@@ -1,0 +1,21 @@
+.reports-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.report-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.report-actions {
+  padding-top: 20px;
+}
+
+:host-context(.dark-theme) {
+  .report-card {
+    background: #1e1e2d;
+    color: #eee;
+  }
+}

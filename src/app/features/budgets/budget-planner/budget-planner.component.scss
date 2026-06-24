@@ -1,0 +1,35 @@
+.budgets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.budgets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.budget-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+:host-context(.dark-theme) {
+  .budget-card {
+    background: #1e1e2d;
+    color: #eee;
+  }
+  .progress-info {
+    color: #aaa;
+  }
+}

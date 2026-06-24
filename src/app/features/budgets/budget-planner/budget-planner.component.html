@@ -1,0 +1,25 @@
+<div class="budgets-container">
+  <h1>Budget Planner</h1>
+  
+  <div class="budgets-grid" *ngIf="budgets$ | async as budgets">
+    <mat-card class="budget-card" *ngFor="let budget of budgets">
+      <mat-card-header>
+        <mat-card-title>{{ budget.category }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ budget.spent | currency }} / {{ budget.limit | currency }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="progress-info">
+          <span>{{ getUtilizationPercentage(budget.spent, budget.limit) | number:'1.0-0' }}% Used</span>
+          <mat-icon *ngIf="getUtilizationPercentage(budget.spent, budget.limit) >= 80" color="warn" matTooltip="Nearing budget limit!">warning</mat-icon>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="getUtilizationPercentage(budget.spent, budget.limit)"
+          [color]="getProgressBarColor(budget.spent, budget.limit)">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="goals-container">
+  <h1>Savings Goals</h1>
+  
+  <div class="goals-grid" *ngIf="goals$ | async as goals">
+    <mat-card class="goal-card" *ngFor="let goal of goals">
+      <mat-card-header>
+        <mat-card-title>{{ goal.title }}</mat-card-title>
+        <mat-card-subtitle>
+          Target: {{ goal.targetAmount | currency }} | Deadline: {{ goal.deadline | date }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="progress-info">
+          <span>{{ goal.currentAmount | currency }} Saved</span>
+          <span>{{ getCompletionPercentage(goal.currentAmount, goal.targetAmount) | number:'1.0-0' }}%</span>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="getCompletionPercentage(goal.currentAmount, goal.targetAmount)"
+          color="accent">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

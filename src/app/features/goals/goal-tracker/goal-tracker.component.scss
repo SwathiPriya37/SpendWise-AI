@@ -1,0 +1,34 @@
+.goals-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.goal-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+:host-context(.dark-theme) {
+  .goal-card {
+    background: #1e1e2d;
+    color: #eee;
+  }
+  .progress-info {
+    color: #aaa;
+  }
+}

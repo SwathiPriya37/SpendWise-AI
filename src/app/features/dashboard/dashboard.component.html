@@ -1,0 +1,188 @@
+<div class="dashboard-header">
+  <div class="header-titles">
+    <h1>Dashboard</h1>
+    <span class="subtitle">Welcome back, Swathi! 👋</span>
+  </div>
+  <div class="header-actions">
+    <button class="date-range-btn">
+      <mat-icon>calendar_today</mat-icon>
+      Jun 1 - Jun 24, 2026
+      <mat-icon>expand_more</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle green">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="kpi-title">Total Expenses</div>
+      </div>
+      <div class="kpi-value">{{ totalExpenses | currency }}</div>
+      <div class="kpi-indicator success">
+        <mat-icon>arrow_downward</mat-icon> 8.4% <span>from last month</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle blue">
+          <mat-icon>savings</mat-icon>
+        </div>
+        <div class="kpi-title">Total Savings</div>
+      </div>
+      <div class="kpi-value">{{ totalSavings | currency }}</div>
+      <div class="kpi-indicator success">
+        <mat-icon>arrow_upward</mat-icon> 12.6% <span>from last month</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle yellow">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="kpi-title">Budget Left</div>
+      </div>
+      <div class="kpi-value">{{ budgetLeft | currency }}</div>
+      <div class="kpi-indicator warning">
+        <mat-icon>arrow_downward</mat-icon> 5.1% <span>from last month</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle purple">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="kpi-title">Expense Growth</div>
+      </div>
+      <div class="kpi-value">{{ growthPercentage }}</div>
+      <div class="kpi-indicator danger">
+        <mat-icon>arrow_upward</mat-icon> <span>from last month</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="charts-grid">
+  <mat-card class="chart-card line-chart-card">
+    <mat-card-header>
+      <mat-card-title>Monthly Spending Trend</mat-card-title>
+      <div class="chart-actions">
+        <button class="dropdown-btn">This Year <mat-icon>expand_more</mat-icon></button>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="chart-content">
+      <div class="custom-legend line-legend">
+        <span class="legend-dot" style="background: #00a859"></span> Monthly Expenses
+      </div>
+      <canvas baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="'line'">
+      </canvas>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="chart-card pie-chart-card">
+    <mat-card-header>
+      <mat-card-title>Expenses by Category</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="pie-content-wrapper">
+      <div class="chart-content pie-chart">
+        <canvas baseChart
+          [data]="pieChartData"
+          [options]="pieChartOptions"
+          [type]="'doughnut'">
+        </canvas>
+      </div>
+      <div class="custom-legend doughnut-legend">
+        <div class="legend-item">
+          <div class="left"><span class="legend-dot" style="background: #34a853"></span> Food</div>
+          <div class="middle">50%</div>
+          <div class="right">$90.25</div>
+        </div>
+        <div class="legend-item">
+          <div class="left"><span class="legend-dot" style="background: #4285f4"></span> Utilities</div>
+          <div class="middle">25%</div>
+          <div class="right">$45.10</div>
+        </div>
+        <div class="legend-item">
+          <div class="left"><span class="legend-dot" style="background: #fbbc04"></span> Entertainment</div>
+          <div class="middle">15%</div>
+          <div class="right">$27.08</div>
+        </div>
+        <div class="legend-item">
+          <div class="left"><span class="legend-dot" style="background: #9c27b0"></span> Transport</div>
+          <div class="middle">10%</div>
+          <div class="right">$18.07</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="transactions-section">
+  <mat-card class="transactions-card">
+    <mat-card-header>
+      <mat-card-title>Recent Transactions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="recentTransactions" class="transactions-table">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef> Title </th>
+          <td mat-cell *matCellDef="let element"> 
+            <div class="title-cell">
+              <div class="icon-circle sm green"><mat-icon>shopping_cart</mat-icon></div>
+              {{element.title}} 
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef> Category </th>
+          <td mat-cell *matCellDef="let element"> 
+            <span class="pill-success">{{element.category}}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef> Date </th>
+          <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef> Amount </th>
+          <td mat-cell *matCellDef="let element" class="danger"> {{element.amount | currency}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let element"> 
+            <span class="pill-danger">{{element.status}}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> </th>
+          <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+            <button mat-icon-button><mat-icon>more_vert</mat-icon></button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

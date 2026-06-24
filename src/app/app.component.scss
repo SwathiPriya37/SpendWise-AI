@@ -1,0 +1,18 @@
+.app-container, .sidenav-container {
+  height: 100vh;
+  margin: 0;
+  background-color: transparent;
+}
+
+.sidenav {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  border-right: none !important;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+}
+
+.main-content {
+  padding: 30px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
