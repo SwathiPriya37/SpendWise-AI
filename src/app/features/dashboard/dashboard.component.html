@@ -1,14 +1,18 @@
 <div class="dashboard-header">
   <div class="header-titles">
     <h1>Dashboard</h1>
-    <span class="subtitle">Welcome back, Swathi! 👋</span>
+    <span class="subtitle">Welcome back, {{ userName }}! 👋</span>
   </div>
   <div class="header-actions">
-    <button class="date-range-btn">
-      <mat-icon>calendar_today</mat-icon>
-      Jun 1 - Jun 24, 2026
-      <mat-icon>expand_more</mat-icon>
-    </button>
+    <mat-form-field appearance="outline" class="date-picker-field">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Start date">
+        <input matEndDate formControlName="end" placeholder="End date">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
   </div>
 </div>
 
@@ -77,14 +81,17 @@
 <div class="charts-grid">
   <mat-card class="chart-card line-chart-card">
     <mat-card-header>
-      <mat-card-title>Monthly Spending Trend</mat-card-title>
+      <mat-card-title>Spending Trend</mat-card-title>
       <div class="chart-actions">
-        <button class="dropdown-btn">This Year <mat-icon>expand_more</mat-icon></button>
+        <button mat-button [matMenuTriggerFor]="menu">Options <mat-icon>expand_more</mat-icon></button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>Export Chart</button>
+        </mat-menu>
       </div>
     </mat-card-header>
     <mat-card-content class="chart-content">
       <div class="custom-legend line-legend">
-        <span class="legend-dot" style="background: #00a859"></span> Monthly Expenses
+        <span class="legend-dot" style="background: #00a859"></span> Daily Expenses
       </div>
       <canvas baseChart
         [data]="lineChartData"
@@ -100,32 +107,20 @@
     </mat-card-header>
     <mat-card-content class="pie-content-wrapper">
       <div class="chart-content pie-chart">
-        <canvas baseChart
+        <canvas baseChart *ngIf="customLegend.length > 0"
           [data]="pieChartData"
           [options]="pieChartOptions"
           [type]="'doughnut'">
         </canvas>
+        <div *ngIf="customLegend.length === 0" style="text-align:center; padding: 40px; color:#999;">
+          No expenses in this period
+        </div>
       </div>
       <div class="custom-legend doughnut-legend">
-        <div class="legend-item">
-          <div class="left"><span class="legend-dot" style="background: #34a853"></span> Food</div>
-          <div class="middle">50%</div>
-          <div class="right">$90.25</div>
-        </div>
-        <div class="legend-item">
-          <div class="left"><span class="legend-dot" style="background: #4285f4"></span> Utilities</div>
-          <div class="middle">25%</div>
-          <div class="right">$45.10</div>
-        </div>
-        <div class="legend-item">
-          <div class="left"><span class="legend-dot" style="background: #fbbc04"></span> Entertainment</div>
-          <div class="middle">15%</div>
-          <div class="right">$27.08</div>
-        </div>
-        <div class="legend-item">
-          <div class="left"><span class="legend-dot" style="background: #9c27b0"></span> Transport</div>
-          <div class="middle">10%</div>
-          <div class="right">$18.07</div>
+        <div class="legend-item" *ngFor="let item of customLegend">
+          <div class="left"><span class="legend-dot" [style.background]="item.color"></span> {{ item.label }}</div>
+          <div class="middle">{{ item.percentage }}</div>
+          <div class="right">{{ item.amount | currency }}</div>
         </div>
       </div>
     </mat-card-content>
@@ -143,7 +138,7 @@
           <th mat-header-cell *matHeaderCellDef> Title </th>
           <td mat-cell *matCellDef="let element"> 
             <div class="title-cell">
-              <div class="icon-circle sm green"><mat-icon>shopping_cart</mat-icon></div>
+              <div class="icon-circle sm green"><mat-icon>receipt</mat-icon></div>
               {{element.title}} 
             </div>
           </td>
@@ -176,12 +171,27 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> </th>
           <td mat-cell *matCellDef="let element" style="text-align: right;"> 
-            <button mat-icon-button><mat-icon>more_vert</mat-icon></button>
+            <button mat-icon-button [matMenuTriggerFor]="actionMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #actionMenu="matMenu">
+              <button mat-menu-item (click)="editExpense(element.id)">
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button mat-menu-item (click)="deleteExpense(element.id)">
+                <mat-icon color="warn">delete</mat-icon> Delete
+              </button>
+            </mat-menu>
           </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="6" style="text-align:center; padding: 24px; color:#999;">
+            No transactions found for the selected date range.
+          </td>
+        </tr>
       </table>
     </mat-card-content>
   </mat-card>

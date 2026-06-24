@@ -23,7 +23,15 @@ export class ExpenseListComponent {
 
   openAddExpenseDialog() {
     this.dialog.open(ExpenseFormComponent, {
-      width: '400px'
+      width: '400px',
+      data: {}
+    });
+  }
+
+  editExpense(expense: any) {
+    this.dialog.open(ExpenseFormComponent, {
+      width: '400px',
+      data: { expense }
     });
   }
 

@@ -1,4 +1,4 @@
-<div class="app-container">
+<div class="app-container" *ngIf="authService.isAuthenticated()">
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #sidenav mode="side" opened class="sidenav">
       <app-sidebar></app-sidebar>
@@ -12,4 +12,8 @@
       </main>
     </mat-sidenav-content>
   </mat-sidenav-container>
+</div>
+
+<div class="auth-only-container" *ngIf="!authService.isAuthenticated()">
+  <router-outlet></router-outlet>
 </div>

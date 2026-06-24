@@ -1,7 +1,7 @@
 <div class="expenses-container">
   <div class="header">
     <h1>Expenses</h1>
-    <button mat-raised-color color="primary" (click)="openAddExpenseDialog()">
+    <button mat-raised-button color="primary" (click)="openAddExpenseDialog()">
       <mat-icon>add</mat-icon> Add Expense
     </button>
   </div>
@@ -32,6 +32,9 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> Actions </th>
           <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" (click)="editExpense(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
             <button mat-icon-button color="warn" (click)="deleteExpense(element.id)">
               <mat-icon>delete</mat-icon>
             </button>

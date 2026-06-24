@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Add New Expense</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit' : 'Add New' }} Expense</h2>
 <mat-dialog-content>
   <form [formGroup]="expenseForm" class="expense-form">
     <mat-form-field appearance="fill" class="full-width">

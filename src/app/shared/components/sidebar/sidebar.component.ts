@@ -2,11 +2,15 @@ import { Component } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ExpenseService } from '../../../core/services/expense.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatListModule, MatIconModule, RouterModule],
+  imports: [MatListModule, MatIconModule, RouterModule, CommonModule],
   template: `
     <div class="sidebar-wrapper">
       <div class="sidebar-header">
@@ -39,10 +43,7 @@ import { RouterModule } from '@angular/router';
           <mat-icon matListItemIcon>description</mat-icon>
           <div matListItemTitle>Reports</div>
         </a>
-        <a mat-list-item routerLink="/settings" routerLinkActive="active">
-          <mat-icon matListItemIcon>settings</mat-icon>
-          <div matListItemTitle>Settings</div>
-        </a>
+
       </mat-nav-list>
 
       <div class="sidebar-footer">
@@ -54,24 +55,31 @@ import { RouterModule } from '@angular/router';
           
           <div class="overview-stat">
             <span class="label">Total Income</span>
-            <span class="value success">$3,000.00</span>
+            <span class="value success">{{ totalIncome | currency }}</span>
           </div>
           
           <div class="overview-stat">
             <span class="label">Total Expenses</span>
-            <span class="value danger">$180.50</span>
+            <span class="value danger">{{ totalExpenses | currency }}</span>
           </div>
           
           <div class="progress-container">
             <div class="progress-bar">
-              <div class="progress-fill" style="width: 60.6%"></div>
+              <div class="progress-fill" [style.width]="savingsRate + '%'"></div>
             </div>
             <div class="progress-labels">
               <span>Savings Rate</span>
-              <span class="success">60.6%</span>
+              <span class="success">{{ savingsRate | number:'1.1-1' }}%</span>
             </div>
           </div>
         </div>
+      </div>
+      
+      <div class="logout-section">
+        <a mat-list-item (click)="logout()" class="logout-btn">
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <div matListItemTitle>Logout</div>
+        </a>
       </div>
     </div>
   `,
@@ -200,7 +208,41 @@ import { RouterModule } from '@angular/router';
     .progress-labels .success {
       font-weight: 600;
     }
+    .logout-section {
+      padding: 16px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .logout-btn {
+      color: #d93025 !important;
+      cursor: pointer;
+    }
     `
   ]
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  private expenseService = inject(ExpenseService);
+  private authService = inject(AuthService);
+  
+  totalIncome = 3000; // Static base income for now
+  totalExpenses = 0;
+  savingsRate = 0;
+
+  constructor() {
+    this.expenseService.expenses$.subscribe(expenses => {
+      this.totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+      this.calculateSavings();
+    });
+  }
+
+  private calculateSavings() {
+    if (this.totalIncome > 0) {
+      const saved = this.totalIncome - this.totalExpenses;
+      this.savingsRate = Math.max(0, (saved / this.totalIncome) * 100);
+    }
+  }
+
+  logout() {
+    this.authService.logout();
+    window.location.reload(); // Reload to trigger auth guard
+  }
+}

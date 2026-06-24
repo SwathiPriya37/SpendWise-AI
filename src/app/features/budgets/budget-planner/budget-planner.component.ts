@@ -5,10 +5,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { BudgetService } from '../../../core/services/budget.service';
 
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 @Component({
   selector: 'app-budget-planner',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatProgressBarModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatProgressBarModule, MatIconModule, MatTooltipModule],
   templateUrl: './budget-planner.component.html',
   styleUrl: './budget-planner.component.scss'
 })

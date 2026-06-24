@@ -1,61 +1,62 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Budget } from '../models/budget.model';
-import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BudgetService {
-  private storage = inject(LocalStorageService);
+  private http = inject(HttpClient);
   private budgetsSubject = new BehaviorSubject<Budget[]>([]);
   budgets$ = this.budgetsSubject.asObservable();
 
-  private readonly BUDGETS_KEY = 'spendwise_budgets';
+  private apiUrl = 'http://localhost:3000/api/budgets';
 
   constructor() {
-    this.loadInitialData();
+    this.loadBudgets();
   }
 
-  private loadInitialData() {
-    const saved = this.storage.getItem<Budget[]>(this.BUDGETS_KEY);
-    if (saved) {
-      this.budgetsSubject.next(saved);
-    } else {
-      const currentMonth = new Date().getMonth() + 1;
-      const currentYear = new Date().getFullYear();
-      const mockData: Budget[] = [
-        { id: '1', category: 'Food', limit: 500, spent: 120.50, month: currentMonth, year: currentYear },
-        { id: '2', category: 'Utilities', limit: 150, spent: 60.00, month: currentMonth, year: currentYear }
-      ];
-      this.storage.setItem(this.BUDGETS_KEY, mockData);
-      this.budgetsSubject.next(mockData);
-    }
+  private loadBudgets() {
+    this.http.get<Budget[]>(this.apiUrl).subscribe(
+      (budgets) => this.budgetsSubject.next(budgets),
+      (error) => console.error('Error loading budgets', error)
+    );
   }
 
   getBudgets(): Observable<Budget[]> {
     return this.budgets$;
   }
 
-  addBudget(budget: Omit<Budget, 'id'>) {
-    const newBudget: Budget = {
-      ...budget,
-      id: crypto.randomUUID()
-    };
-    const updated = [...this.budgetsSubject.value, newBudget];
-    this.storage.setItem(this.BUDGETS_KEY, updated);
-    this.budgetsSubject.next(updated);
+  addBudget(budget: Omit<Budget, 'id'>): Observable<Budget> {
+    return this.http.post<Budget>(this.apiUrl, budget).pipe(
+      tap((newBudget) => {
+        const updated = [...this.budgetsSubject.value, newBudget];
+        this.budgetsSubject.next(updated);
+      })
+    );
   }
 
-  updateBudget(updatedBudget: Budget) {
-    const updated = this.budgetsSubject.value.map(b => b.id === updatedBudget.id ? updatedBudget : b);
-    this.storage.setItem(this.BUDGETS_KEY, updated);
-    this.budgetsSubject.next(updated);
+  updateBudget(updatedBudget: Budget): Observable<Budget> {
+    return this.http.put<Budget>(`${this.apiUrl}/${updatedBudget.id}`, updatedBudget).pipe(
+      tap((updated) => {
+        const current = this.budgetsSubject.value;
+        const index = current.findIndex(b => b.id === updated.id);
+        if (index !== -1) {
+          current[index] = updated;
+          this.budgetsSubject.next([...current]);
+        }
+      })
+    );
   }
 
-  deleteBudget(id: string) {
-    const updated = this.budgetsSubject.value.filter(b => b.id !== id);
-    this.storage.setItem(this.BUDGETS_KEY, updated);
-    this.budgetsSubject.next(updated);
+  deleteBudget(id: string | number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        const updated = this.budgetsSubject.value.filter(b => b.id !== id);
+        this.budgetsSubject.next(updated);
+      })
+    );
   }
 }
