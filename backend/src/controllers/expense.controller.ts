@@ -6,7 +6,8 @@ export const getExpenses = async (req: AuthRequest, res: Response) => {
   try {
     const expenses = await prisma.expense.findMany({
       where: { userId: req.userId },
-      orderBy: { date: 'desc' }
+      orderBy: { date: 'desc' },
+      include: { tags: true }
     });
     res.json(expenses);
   } catch (error) {
@@ -16,7 +17,14 @@ export const getExpenses = async (req: AuthRequest, res: Response) => {
 
 export const createExpense = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, amount, category, date, notes } = req.body;
+    const { title, amount, category, date, notes, tags } = req.body;
+    
+    // Process tags: e.g. ['#food', '#travel']
+    const tagConnectOrCreate = (tags || []).map((tagName: string) => ({
+      where: { name: tagName },
+      create: { name: tagName }
+    }));
+
     const expense = await prisma.expense.create({
       data: {
         title,
@@ -24,8 +32,12 @@ export const createExpense = async (req: AuthRequest, res: Response) => {
         category,
         date: new Date(date),
         notes,
-        userId: req.userId!
-      }
+        userId: req.userId!,
+        tags: {
+          connectOrCreate: tagConnectOrCreate
+        }
+      },
+      include: { tags: true }
     });
     res.status(201).json(expense);
   } catch (error) {
@@ -36,7 +48,7 @@ export const createExpense = async (req: AuthRequest, res: Response) => {
 export const updateExpense = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, amount, category, date, notes } = req.body;
+    const { title, amount, category, date, notes, tags } = req.body;
     
     const expense = await prisma.expense.findFirst({ where: { id: Number(id), userId: req.userId } });
     if (!expense) {
@@ -44,9 +56,25 @@ export const updateExpense = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    const tagConnectOrCreate = (tags || []).map((tagName: string) => ({
+      where: { name: tagName },
+      create: { name: tagName }
+    }));
+
     const updatedExpense = await prisma.expense.update({
       where: { id: Number(id) },
-      data: { title, amount: Number(amount), category, date: new Date(date), notes }
+      data: { 
+        title, 
+        amount: Number(amount), 
+        category, 
+        date: new Date(date), 
+        notes,
+        tags: {
+          set: [], // clear existing
+          connectOrCreate: tagConnectOrCreate
+        }
+      },
+      include: { tags: true }
     });
     res.json(updatedExpense);
   } catch (error) {

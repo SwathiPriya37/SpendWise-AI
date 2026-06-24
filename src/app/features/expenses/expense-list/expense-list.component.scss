@@ -17,3 +17,69 @@
 table {
   width: 100%;
 }
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: -1.25em; /* remove extra bottom space from outline inputs */
+  }
+
+  .amount-range {
+    display: flex;
+    align-items: center;
+    mat-form-field {
+      flex: none;
+      min-width: 120px;
+    }
+  }
+}
+
+.tag-badge {
+  background: #f0f0f0;
+  color: #555;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+:host-context(.dark-theme) {
+  .tag-badge {
+    background: #333;
+    color: #ccc;
+  }
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+
+  .chart-card {
+    display: flex;
+    flex-direction: column;
+
+    mat-card-header {
+      padding: 16px 20px;
+      mat-card-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+    }
+
+    .chart-content {
+      height: 250px;
+      position: relative;
+      padding: 0 20px 20px 20px;
+      flex: 1;
+    }
+  }
+}

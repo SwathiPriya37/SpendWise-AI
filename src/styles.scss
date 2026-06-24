@@ -87,3 +87,28 @@ body.dark-theme {
   font-weight: 500;
   display: inline-block;
 }
+
+/* Snackbar styles */
+.success-snackbar {
+  --mdc-snackbar-container-color: #e5f5eb;
+  --mdc-snackbar-supporting-text-color: #007946;
+  --mdc-snackbar-action-focus-state-layer-color: #007946;
+  --mdc-snackbar-action-hover-state-layer-color: #007946;
+  --mat-mdc-snack-bar-button-color: #007946;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: #fdeceb;
+  --mdc-snackbar-supporting-text-color: #d93025;
+  --mdc-snackbar-action-focus-state-layer-color: #d93025;
+  --mdc-snackbar-action-hover-state-layer-color: #d93025;
+  --mat-mdc-snack-bar-button-color: #d93025;
+}
+
+.info-snackbar {
+  --mdc-snackbar-container-color: #e8f0fe;
+  --mdc-snackbar-supporting-text-color: #1a73e8;
+  --mdc-snackbar-action-focus-state-layer-color: #1a73e8;
+  --mdc-snackbar-action-hover-state-layer-color: #1a73e8;
+  --mat-mdc-snack-bar-button-color: #1a73e8;
+}

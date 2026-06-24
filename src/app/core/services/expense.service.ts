@@ -1,14 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { Expense } from '../models/expense.model';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExpenseService {
   private http = inject(HttpClient);
+  private notification = inject(NotificationService);
   private expensesSubject = new BehaviorSubject<Expense[]>([]);
   expenses$ = this.expensesSubject.asObservable();
 
@@ -34,6 +36,11 @@ export class ExpenseService {
       tap((newExpense) => {
         const current = this.expensesSubject.value;
         this.expensesSubject.next([newExpense, ...current]);
+        this.notification.success('Expense created successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to create expense');
+        throw err;
       })
     );
   }
@@ -47,6 +54,11 @@ export class ExpenseService {
           current[index] = updated;
           this.expensesSubject.next([...current]);
         }
+        this.notification.success('Expense updated successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to update expense');
+        throw err;
       })
     );
   }
@@ -56,6 +68,11 @@ export class ExpenseService {
       tap(() => {
         const current = this.expensesSubject.value;
         this.expensesSubject.next(current.filter(e => e.id !== id));
+        this.notification.info('Expense deleted');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to delete expense');
+        throw err;
       })
     );
   }

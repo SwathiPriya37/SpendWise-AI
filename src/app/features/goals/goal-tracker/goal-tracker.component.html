@@ -1,5 +1,10 @@
 <div class="goals-container">
-  <h1>Savings Goals</h1>
+  <div class="header">
+    <h1>Savings Goals</h1>
+    <button mat-raised-button color="primary" (click)="openAddGoalDialog()">
+      <mat-icon>add</mat-icon> Add Goal
+    </button>
+  </div>
   
   <div class="goals-grid" *ngIf="goals$ | async as goals">
     <mat-card class="goal-card" *ngFor="let goal of goals">
@@ -20,6 +25,10 @@
           color="accent">
         </mat-progress-bar>
       </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="editGoal(goal)">Edit</button>
+        <button mat-button color="warn" (click)="deleteGoal(goal.id)">Delete</button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>

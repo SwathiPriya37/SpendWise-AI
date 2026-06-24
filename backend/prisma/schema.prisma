@@ -8,15 +8,20 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  password     String
-  name         String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  expenses     Expense[]
-  budgets      Budget[]
-  savingsGoals SavingsGoal[]
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  password         String
+  name             String?
+  role             String             @default("USER")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  expenses         Expense[]
+  incomes          Income[]
+  budgets          Budget[]
+  savingsGoals     SavingsGoal[]
+  recurring        RecurringExpense[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
 }
 
 model Expense {
@@ -28,8 +33,15 @@ model Expense {
   notes     String?
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+  tags      Tag[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  expenses  Expense[]
 }
 
 model Budget {
@@ -53,4 +65,53 @@ model SavingsGoal {
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Income {
+  id        Int      @id @default(autoincrement())
+  title     String
+  amount    Float
+  source    String
+  date      DateTime
+  notes     String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RecurringExpense {
+  id                Int      @id @default(autoincrement())
+  title             String
+  amount            Float
+  category          String
+  frequency         String   // "DAILY", "WEEKLY", "MONTHLY", "YEARLY"
+  startDate         DateTime
+  lastGeneratedDate DateTime?
+  nextGeneratedDate DateTime
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  type      String   // "INFO", "WARNING", "ALERT", "SUCCESS"
+  read      Boolean  @default(false)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  entityId  Int?
+  details   String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }

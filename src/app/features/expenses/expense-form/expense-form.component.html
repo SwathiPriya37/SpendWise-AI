@@ -27,6 +27,12 @@
       <mat-label>Notes</mat-label>
       <textarea matInput formControlName="notes" rows="3"></textarea>
     </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Tags</mat-label>
+      <input matInput formControlName="tags" placeholder="e.g. #food, #vacation">
+      <mat-hint>Separate tags with commas and use # prefix</mat-hint>
+    </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

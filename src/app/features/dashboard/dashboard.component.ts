@@ -9,6 +9,7 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 import { ExpenseService } from '../../core/services/expense.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { GoalService } from '../../core/services/goal.service';
+import { IncomeService } from '../../core/services/income.service';
 import { AuthService } from '../../core/services/auth.service';
 import { combineLatest } from 'rxjs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -41,6 +42,7 @@ export class DashboardComponent implements OnInit {
   expenseService = inject(ExpenseService);
   budgetService = inject(BudgetService);
   goalService = inject(GoalService);
+  incomeService = inject(IncomeService);
   authService = inject(AuthService);
   router = inject(Router);
 
@@ -49,8 +51,13 @@ export class DashboardComponent implements OnInit {
   displayedColumns = ['title', 'category', 'date', 'amount', 'status', 'actions'];
 
   totalExpenses = 0;
+  totalIncome = 0;
   totalSavings = 0; 
   budgetLeft = 0; 
+  savingsRate = 0;
+  financialHealthScore = 0;
+  topCategory = 'None';
+  upcomingGoalDeadline = 'None';
   growthPercentage = '0%';
   isGrowthPositive = false;
 
@@ -117,8 +124,9 @@ export class DashboardComponent implements OnInit {
       this.expenseService.expenses$,
       this.budgetService.budgets$,
       this.goalService.goals$,
+      this.incomeService.incomes$,
       this.dateRange.valueChanges
-    ]).subscribe(([expenses, budgets, goals, dates]) => {
+    ]).subscribe(([expenses, budgets, goals, incomes, dates]) => {
       // Date filtering
       const start = dates.start || new Date(0);
       const end = dates.end || new Date();
@@ -128,13 +136,41 @@ export class DashboardComponent implements OnInit {
         const d = new Date(e.date);
         return d >= start && d <= end;
       });
+      
+      const filteredIncomes = incomes.filter(i => {
+        const d = new Date(i.date);
+        return d >= start && d <= end;
+      });
 
       // KPIs
       this.totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+      this.totalIncome = filteredIncomes.reduce((sum, i) => sum + i.amount, 0);
       this.totalSavings = goals.reduce((sum, g) => sum + g.currentAmount, 0);
       
       const totalBudgetLimit = budgets.reduce((sum, b) => sum + b.limit, 0);
       this.budgetLeft = Math.max(0, totalBudgetLimit - this.totalExpenses);
+
+      if (this.totalIncome > 0) {
+        this.savingsRate = Math.round(((this.totalIncome - this.totalExpenses) / this.totalIncome) * 100);
+        this.savingsRate = Math.max(0, this.savingsRate);
+      } else {
+        this.savingsRate = 0;
+      }
+
+      // Financial Health Score (simple mock logic: high savings rate and staying under budget = good score)
+      let score = 50;
+      if (this.savingsRate >= 20) score += 20;
+      if (this.budgetLeft > 0) score += 20;
+      if (this.totalSavings > 1000) score += 10;
+      this.financialHealthScore = Math.min(100, Math.max(0, score));
+
+      // Upcoming Goal Deadline
+      const activeGoals = goals.filter(g => new Date(g.deadline) > new Date()).sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+      if (activeGoals.length > 0) {
+        this.upcomingGoalDeadline = `${activeGoals[0].title} (${new Date(activeGoals[0].deadline).toLocaleDateString()})`;
+      } else {
+        this.upcomingGoalDeadline = 'None';
+      }
 
       // Previous month mock comparison (just for UI)
       this.growthPercentage = '+2.4%';
@@ -171,6 +207,13 @@ export class DashboardComponent implements OnInit {
     const labels = Array.from(categoryMap.keys());
     const data = Array.from(categoryMap.values());
     const bgColors = ['#34a853', '#4285f4', '#fbbc04', '#9c27b0', '#ff6d00', '#00bcd4'];
+
+    if (data.length > 0) {
+      const maxIndex = data.indexOf(Math.max(...data));
+      this.topCategory = labels[maxIndex];
+    } else {
+      this.topCategory = 'None';
+    }
 
     this.pieChartData = {
       labels,

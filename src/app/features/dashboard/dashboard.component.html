@@ -16,18 +16,32 @@
   </div>
 </div>
 
-<div class="kpi-grid">
   <mat-card class="kpi-card">
     <mat-card-content>
       <div class="kpi-header">
         <div class="icon-circle green">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="kpi-title">Total Income</div>
+      </div>
+      <div class="kpi-value">{{ totalIncome | currency }}</div>
+      <div class="kpi-indicator success">
+        <mat-icon>arrow_upward</mat-icon> <span>from last month</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle red">
           <mat-icon>account_balance_wallet</mat-icon>
         </div>
         <div class="kpi-title">Total Expenses</div>
       </div>
       <div class="kpi-value">{{ totalExpenses | currency }}</div>
-      <div class="kpi-indicator success">
-        <mat-icon>arrow_downward</mat-icon> 8.4% <span>from last month</span>
+      <div class="kpi-indicator danger">
+        <mat-icon>trending_up</mat-icon> <span>Watch spending</span>
       </div>
     </mat-card-content>
   </mat-card>
@@ -42,22 +56,7 @@
       </div>
       <div class="kpi-value">{{ totalSavings | currency }}</div>
       <div class="kpi-indicator success">
-        <mat-icon>arrow_upward</mat-icon> 12.6% <span>from last month</span>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="kpi-card">
-    <mat-card-content>
-      <div class="kpi-header">
-        <div class="icon-circle yellow">
-          <mat-icon>account_balance_wallet</mat-icon>
-        </div>
-        <div class="kpi-title">Budget Left</div>
-      </div>
-      <div class="kpi-value">{{ budgetLeft | currency }}</div>
-      <div class="kpi-indicator warning">
-        <mat-icon>arrow_downward</mat-icon> 5.1% <span>from last month</span>
+        <mat-icon>arrow_upward</mat-icon> <span>On track</span>
       </div>
     </mat-card-content>
   </mat-card>
@@ -66,13 +65,73 @@
     <mat-card-content>
       <div class="kpi-header">
         <div class="icon-circle purple">
-          <mat-icon>trending_up</mat-icon>
+          <mat-icon>percent</mat-icon>
         </div>
-        <div class="kpi-title">Expense Growth</div>
+        <div class="kpi-title">Savings Rate</div>
       </div>
-      <div class="kpi-value">{{ growthPercentage }}</div>
-      <div class="kpi-indicator danger">
-        <mat-icon>arrow_upward</mat-icon> <span>from last month</span>
+      <div class="kpi-value">{{ savingsRate }}%</div>
+      <div class="kpi-indicator" [ngClass]="savingsRate >= 20 ? 'success' : 'warning'">
+        <mat-icon>{{ savingsRate >= 20 ? 'check_circle' : 'warning' }}</mat-icon> <span>Target: 20%</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle yellow">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <div class="kpi-title">Budget Left</div>
+      </div>
+      <div class="kpi-value">{{ budgetLeft | currency }}</div>
+      <div class="kpi-indicator" [ngClass]="budgetLeft > 0 ? 'success' : 'danger'">
+        <mat-icon>{{ budgetLeft > 0 ? 'check_circle' : 'warning' }}</mat-icon> <span>For current period</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle orange">
+          <mat-icon>favorite</mat-icon>
+        </div>
+        <div class="kpi-title">Health Score</div>
+      </div>
+      <div class="kpi-value">{{ financialHealthScore }}/100</div>
+      <div class="kpi-indicator" [ngClass]="financialHealthScore >= 70 ? 'success' : 'warning'">
+        <mat-icon>monitor_heart</mat-icon> <span>Overall financial health</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle teal">
+          <mat-icon>category</mat-icon>
+        </div>
+        <div class="kpi-title">Top Spending Category</div>
+      </div>
+      <div class="kpi-value" style="font-size: 1.5rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ topCategory }}</div>
+      <div class="kpi-indicator text-muted">
+        <mat-icon>info</mat-icon> <span>Highest expense area</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="kpi-card">
+    <mat-card-content>
+      <div class="kpi-header">
+        <div class="icon-circle indigo">
+          <mat-icon>event</mat-icon>
+        </div>
+        <div class="kpi-title">Next Goal Deadline</div>
+      </div>
+      <div class="kpi-value" style="font-size: 1.2rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ upcomingGoalDeadline }}</div>
+      <div class="kpi-indicator text-muted">
+        <mat-icon>schedule</mat-icon> <span>Upcoming milestone</span>
       </div>
     </mat-card-content>
   </mat-card>

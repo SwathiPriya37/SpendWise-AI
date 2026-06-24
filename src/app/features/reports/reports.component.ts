@@ -32,7 +32,7 @@ export class ReportsComponent {
       const csvContent = [
         headers.join(','),
         ...csvData.map((row: any[]) => row.map((cell: string) => '"' + cell + '"').join(','))
-      ].join('\\n');
+      ].join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');

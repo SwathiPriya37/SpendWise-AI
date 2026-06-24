@@ -27,7 +27,8 @@ export class ExpenseFormComponent implements OnInit {
     amount: ['', [Validators.required, Validators.min(0.01)]],
     category: ['', Validators.required],
     date: [new Date().toISOString().split('T')[0], Validators.required],
-    notes: ['']
+    notes: [''],
+    tags: ['']
   });
 
   categories = ['Food', 'Utilities', 'Entertainment', 'Transport', 'Healthcare', 'Other'];
@@ -42,7 +43,8 @@ export class ExpenseFormComponent implements OnInit {
         amount: e.amount,
         category: e.category,
         date: new Date(e.date).toISOString().split('T')[0],
-        notes: e.notes
+        notes: e.notes,
+        tags: e.tags ? (typeof e.tags[0] === 'string' ? e.tags.join(', ') : e.tags.map((t:any) => t.name).join(', ')) : ''
       });
     }
   }
@@ -55,7 +57,8 @@ export class ExpenseFormComponent implements OnInit {
         amount: Number(formValue.amount),
         category: formValue.category!,
         date: new Date(formValue.date!).toISOString(),
-        notes: formValue.notes || ''
+        notes: formValue.notes || '',
+        tags: formValue.tags ? formValue.tags.split(',').map(t => t.trim()).filter(t => t.startsWith('#')) : []
       };
 
       if (this.isEditMode) {

@@ -5,6 +5,8 @@ import authRoutes from './routes/auth.routes';
 import expenseRoutes from './routes/expense.routes';
 import budgetRoutes from './routes/budget.routes';
 import goalRoutes from './routes/goal.routes';
+import incomeRoutes from './routes/income.routes';
+import recurringRoutes from './routes/recurring.routes';
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/goals', goalRoutes);
+app.use('/api/incomes', incomeRoutes);
+app.use('/api/recurring', recurringRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

@@ -56,6 +56,10 @@
       &.blue { background: var(--icon-bg-blue); color: var(--icon-color-blue); }
       &.yellow { background: var(--icon-bg-yellow); color: var(--icon-color-yellow); }
       &.purple { background: var(--icon-bg-purple); color: var(--icon-color-purple); }
+      &.red { background: rgba(217, 48, 37, 0.1); color: #d93025; }
+      &.orange { background: rgba(255, 152, 0, 0.1); color: #ff9800; }
+      &.teal { background: rgba(0, 150, 136, 0.1); color: #009688; }
+      &.indigo { background: rgba(63, 81, 181, 0.1); color: #3f51b5; }
 
       &.sm { width: 32px; height: 32px; mat-icon { font-size: 18px; width: 18px; height: 18px; } }
     }

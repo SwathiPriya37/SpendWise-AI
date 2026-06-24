@@ -1,5 +1,10 @@
 <div class="budgets-container">
-  <h1>Budget Planner</h1>
+  <div class="header">
+    <h1>Budget Planner</h1>
+    <button mat-raised-button color="primary" (click)="openAddBudgetDialog()">
+      <mat-icon>add</mat-icon> Add Budget
+    </button>
+  </div>
   
   <div class="budgets-grid" *ngIf="budgets$ | async as budgets">
     <mat-card class="budget-card" *ngFor="let budget of budgets">
@@ -20,6 +25,10 @@
           [color]="getProgressBarColor(budget.spent, budget.limit)">
         </mat-progress-bar>
       </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="editBudget(budget)">Edit</button>
+        <button mat-button color="warn" (click)="deleteBudget(budget.id)">Delete</button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>

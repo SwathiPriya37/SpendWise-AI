@@ -6,9 +6,80 @@
     </button>
   </div>
 
-  <mat-card>
+  <mat-card class="filter-card" style="margin-bottom: 24px;">
     <mat-card-content>
-      <table mat-table [dataSource]="(expenses$ | async) || []" class="mat-elevation-z0">
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Search Title</mat-label>
+          <input matInput formControlName="searchQuery" placeholder="e.g. Rent">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Date Range</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate formControlName="startDate" placeholder="Start">
+            <input matEndDate formControlName="endDate" placeholder="End">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+
+        <div class="amount-range">
+          <mat-form-field appearance="outline" style="width: 120px;">
+            <mat-label>Min Amount</mat-label>
+            <input matInput type="number" formControlName="minAmount">
+          </mat-form-field>
+          <span style="padding: 0 8px; align-self: center;">-</span>
+          <mat-form-field appearance="outline" style="width: 120px;">
+            <mat-label>Max Amount</mat-label>
+            <input matInput type="number" formControlName="maxAmount">
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="filteredExpenses$ | async as expenses">
+    <div class="analytics-grid" *ngIf="expenses.length > 0">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Expense Trend</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'"></canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Category Distribution</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="'doughnut'"></canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Spending by Tag</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <canvas baseChart [data]="tagChartData" [options]="tagChartOptions" [type]="'bar'"></canvas>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card *ngIf="expenses.length > 0">
+      <mat-card-content>
+        <table mat-table [dataSource]="expenses" class="mat-elevation-z0">
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef> Title </th>
           <td mat-cell *matCellDef="let element"> {{element.title}} </td>
@@ -29,6 +100,14 @@
           <td mat-cell *matCellDef="let element"> {{element.amount | currency}} </td>
         </ng-container>
 
+        <ng-container matColumnDef="tags">
+          <th mat-header-cell *matHeaderCellDef> Tags </th>
+          <td mat-cell *matCellDef="let element">
+            <span *ngIf="!element.tags || element.tags.length === 0" style="color: #999; font-size: 0.85rem;">-</span>
+            <span *ngFor="let tag of element.tags" class="tag-badge">{{ tag.name }}</span>
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> Actions </th>
           <td mat-cell *matCellDef="let element">
@@ -46,4 +125,11 @@
       </table>
     </mat-card-content>
   </mat-card>
+
+  <app-empty-state *ngIf="expenses.length === 0"
+    icon="search_off"
+    title="No expenses found"
+    description="Try adjusting your search filters or add a new expense.">
+  </app-empty-state>
+  </ng-container>
 </div>
