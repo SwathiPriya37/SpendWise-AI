@@ -60,4 +60,17 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
   }
+
+  updateProfile(data: { name: string }): Observable<{ user: User }> {
+    return this.http.put<{ user: User }>(`${this.apiUrl}/profile`, data).pipe(
+      tap(response => {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        this.currentUserSubject.next(response.user);
+      })
+    );
+  }
+
+  changePassword(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/password`, data);
+  }
 }

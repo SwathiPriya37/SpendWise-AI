@@ -49,6 +49,9 @@ model Budget {
   category  String
   limit     Float
   spent     Float    @default(0)
+  month     Int
+  year      Int
+  notes     String?
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())

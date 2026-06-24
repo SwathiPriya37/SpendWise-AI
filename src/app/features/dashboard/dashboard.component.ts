@@ -145,7 +145,9 @@ export class DashboardComponent implements OnInit {
       // KPIs
       this.totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
       this.totalIncome = filteredIncomes.reduce((sum, i) => sum + i.amount, 0);
-      this.totalSavings = goals.reduce((sum, g) => sum + g.currentAmount, 0);
+      
+      const goalsList = goals as any[];
+      this.totalSavings = goalsList.reduce((sum, g) => sum + g.currentAmount, 0);
       
       const totalBudgetLimit = budgets.reduce((sum, b) => sum + b.limit, 0);
       this.budgetLeft = Math.max(0, totalBudgetLimit - this.totalExpenses);
@@ -165,7 +167,7 @@ export class DashboardComponent implements OnInit {
       this.financialHealthScore = Math.min(100, Math.max(0, score));
 
       // Upcoming Goal Deadline
-      const activeGoals = goals.filter(g => new Date(g.deadline) > new Date()).sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+      const activeGoals = goalsList.filter(g => new Date(g.deadline) > new Date()).sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
       if (activeGoals.length > 0) {
         this.upcomingGoalDeadline = `${activeGoals[0].title} (${new Date(activeGoals[0].deadline).toLocaleDateString()})`;
       } else {

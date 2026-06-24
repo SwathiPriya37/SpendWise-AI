@@ -15,11 +15,14 @@ export const getBudgets = async (req: AuthRequest, res: Response) => {
 
 export const createBudget = async (req: AuthRequest, res: Response) => {
   try {
-    const { category, limit } = req.body;
+    const { category, limit, month, year, notes } = req.body;
     const budget = await prisma.budget.create({
       data: {
         category,
         limit: Number(limit),
+        month: Number(month),
+        year: Number(year),
+        notes,
         userId: req.userId!
       }
     });
@@ -32,7 +35,7 @@ export const createBudget = async (req: AuthRequest, res: Response) => {
 export const updateBudget = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { category, limit, spent } = req.body;
+    const { category, limit, month, year, notes, spent } = req.body;
     
     const budget = await prisma.budget.findFirst({ where: { id: Number(id), userId: req.userId } });
     if (!budget) {
@@ -42,7 +45,14 @@ export const updateBudget = async (req: AuthRequest, res: Response) => {
 
     const updatedBudget = await prisma.budget.update({
       where: { id: Number(id) },
-      data: { category, limit: Number(limit), spent: spent ? Number(spent) : undefined }
+      data: { 
+        category, 
+        limit: Number(limit), 
+        month: Number(month),
+        year: Number(year),
+        notes,
+        spent: spent ? Number(spent) : undefined 
+      }
     });
     res.json(updatedBudget);
   } catch (error) {

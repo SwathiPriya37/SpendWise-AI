@@ -5,7 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { GoalService } from '../../../../core/services/goal.service';
+import { GoalService } from '../../../core/services/goal.service';
 
 @Component({
   selector: 'app-goal-form',
@@ -89,7 +89,8 @@ export class GoalFormComponent implements OnInit {
       };
 
       if (this.isEditMode) {
-        this.goalService.updateGoal({ ...this.data.goal, ...goalData }).subscribe(() => {
+        const existingGoal = this.data.goal as any;
+        this.goalService.updateGoal({ ...existingGoal, ...goalData }).subscribe(() => {
           this.dialogRef.close(true);
         });
       } else {

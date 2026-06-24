@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { BudgetService } from '../../../../core/services/budget.service';
+import { BudgetService } from '../../../core/services/budget.service';
 
 @Component({
   selector: 'app-budget-form',
@@ -25,6 +25,22 @@ import { BudgetService } from '../../../../core/services/budget.service';
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Monthly Limit</mat-label>
           <input matInput type="number" formControlName="limit" placeholder="0.00">
+        </mat-form-field>
+        <div style="display: flex; gap: 16px;">
+          <mat-form-field appearance="fill" style="flex: 1;">
+            <mat-label>Month</mat-label>
+            <mat-select formControlName="month">
+              <mat-option *ngFor="let m of months" [value]="m.value">{{m.label}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="flex: 1;">
+            <mat-label>Year</mat-label>
+            <input matInput type="number" formControlName="year">
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="2"></textarea>
         </mat-form-field>
       </form>
     </mat-dialog-content>
@@ -54,10 +70,19 @@ export class BudgetFormComponent implements OnInit {
 
   budgetForm = this.fb.group({
     category: ['', Validators.required],
-    limit: ['', [Validators.required, Validators.min(0.01)]]
+    limit: ['', [Validators.required, Validators.min(0.01)]],
+    month: [new Date().getMonth() + 1, Validators.required],
+    year: [new Date().getFullYear(), Validators.required],
+    notes: ['']
   });
 
   categories = ['Food', 'Utilities', 'Entertainment', 'Transport', 'Healthcare', 'Other'];
+  months = [
+    { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
+    { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
+    { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
+    { value: 10, label: 'October' }, { value: 11, label: 'November' }, { value: 12, label: 'December' }
+  ];
   isEditMode = false;
 
   ngOnInit() {
@@ -65,7 +90,10 @@ export class BudgetFormComponent implements OnInit {
       this.isEditMode = true;
       this.budgetForm.patchValue({
         category: this.data.budget.category,
-        limit: this.data.budget.limit
+        limit: this.data.budget.limit,
+        month: this.data.budget.month,
+        year: this.data.budget.year,
+        notes: this.data.budget.notes
       });
     }
   }
@@ -76,11 +104,15 @@ export class BudgetFormComponent implements OnInit {
       const budgetData = {
         category: formValue.category!,
         limit: Number(formValue.limit),
+        month: Number(formValue.month),
+        year: Number(formValue.year),
+        notes: formValue.notes || '',
         spent: 0
       };
 
       if (this.isEditMode) {
-        this.budgetService.updateBudget({ ...this.data.budget, limit: budgetData.limit }).subscribe(() => {
+        const existingBudget = this.data.budget as any;
+        this.budgetService.updateBudget({ ...existingBudget, ...budgetData }).subscribe(() => {
           this.dialogRef.close(true);
         });
       } else {

@@ -7,6 +7,7 @@ import budgetRoutes from './routes/budget.routes';
 import goalRoutes from './routes/goal.routes';
 import incomeRoutes from './routes/income.routes';
 import recurringRoutes from './routes/recurring.routes';
+import notificationRoutes from './routes/notification.routes';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use('/api/budgets', budgetRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/incomes', incomeRoutes);
 app.use('/api/recurring', recurringRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

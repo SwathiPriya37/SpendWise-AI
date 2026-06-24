@@ -1,14 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { Budget } from '../models/budget.model';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BudgetService {
   private http = inject(HttpClient);
+  private notification = inject(NotificationService);
   private budgetsSubject = new BehaviorSubject<Budget[]>([]);
   budgets$ = this.budgetsSubject.asObservable();
 
@@ -34,6 +36,11 @@ export class BudgetService {
       tap((newBudget) => {
         const updated = [...this.budgetsSubject.value, newBudget];
         this.budgetsSubject.next(updated);
+        this.notification.success('Budget created successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to create budget');
+        throw err;
       })
     );
   }
@@ -47,6 +54,11 @@ export class BudgetService {
           current[index] = updated;
           this.budgetsSubject.next([...current]);
         }
+        this.notification.success('Budget updated successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to update budget');
+        throw err;
       })
     );
   }
@@ -56,6 +68,11 @@ export class BudgetService {
       tap(() => {
         const updated = this.budgetsSubject.value.filter(b => b.id !== id);
         this.budgetsSubject.next(updated);
+        this.notification.info('Budget deleted');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to delete budget');
+        throw err;
       })
     );
   }

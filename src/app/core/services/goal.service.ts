@@ -1,14 +1,25 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { SavingsGoal } from '../models/savings-goal.model';
+import { tap, catchError } from 'rxjs/operators';
+import { NotificationService } from './notification.service';
+
+export interface SavingsGoal {
+  id: number;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoalService {
   private http = inject(HttpClient);
+  private notification = inject(NotificationService);
   private goalsSubject = new BehaviorSubject<SavingsGoal[]>([]);
   goals$ = this.goalsSubject.asObservable();
 
@@ -34,6 +45,11 @@ export class GoalService {
       tap((newGoal) => {
         const updated = [...this.goalsSubject.value, newGoal];
         this.goalsSubject.next(updated);
+        this.notification.success('Savings goal created successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to create savings goal');
+        throw err;
       })
     );
   }
@@ -47,6 +63,11 @@ export class GoalService {
           current[index] = updated;
           this.goalsSubject.next([...current]);
         }
+        this.notification.success('Savings goal updated successfully');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to update savings goal');
+        throw err;
       })
     );
   }
@@ -56,6 +77,11 @@ export class GoalService {
       tap(() => {
         const updated = this.goalsSubject.value.filter(g => g.id !== id);
         this.goalsSubject.next(updated);
+        this.notification.info('Savings goal deleted');
+      }),
+      catchError(err => {
+        this.notification.error('Failed to delete savings goal');
+        throw err;
       })
     );
   }

@@ -90,8 +90,8 @@ export class ExpenseListComponent {
         const matchesCategory = !filters.category || filters.category === 'All' || e.category === filters.category;
         
         // Amount Filter
-        const matchesMin = filters.minAmount === null || e.amount >= filters.minAmount;
-        const matchesMax = filters.maxAmount === null || e.amount <= filters.maxAmount;
+        const matchesMin = filters.minAmount === null || filters.minAmount === undefined || e.amount >= filters.minAmount;
+        const matchesMax = filters.maxAmount === null || filters.maxAmount === undefined || e.amount <= filters.maxAmount;
         
         // Date Filter
         const d = new Date(e.date);

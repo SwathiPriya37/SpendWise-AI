@@ -1,47 +1,180 @@
 .goals-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
 }
 
 .goals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
 }
 
 .goal-card {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 
-  .header {
+  .goal-header-flex {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    
-    h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 600;
+    width: 100%;
+    align-items: flex-start;
+
+    .title-section {
+      mat-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      mat-card-subtitle {
+        color: #777;
+        font-size: 0.9rem;
+      }
     }
+
+    .time-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+
+      &.neutral {
+        background: rgba(63, 81, 181, 0.1);
+        color: #3f51b5;
+      }
+      &.danger {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+    }
+  }
+
+  mat-card-content {
+    padding-top: 16px;
   }
 
   .progress-info {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #666;
+
+    .saved-amount {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .percentage {
+      font-size: 1.1rem;
+      font-weight: 600;
+
+      &.primary { color: #00a859; }
+      &.accent { color: #ff9800; }
+      &.warn { color: #f44336; }
+    }
+  }
+
+  mat-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .analytics-section {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .analytic-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #666;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .alerts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .milestone-alert {
+      padding: 8px 12px;
+      background: rgba(255, 152, 0, 0.1);
+      border-left: 4px solid #ff9800;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #e65100;
+      font-weight: 500;
+    }
+  }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  color: #888;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px dashed #ccc;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    max-width: 400px;
   }
 }
 
 :host-context(.dark-theme) {
+  .header h1 { color: #eee; }
   .goal-card {
     background: #1e1e2d;
-    color: #eee;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+    .goal-header-flex .title-section mat-card-title { color: #eee; }
+    .goal-header-flex .title-section mat-card-subtitle { color: #aaa; }
+    
+    .progress-info .saved-amount { color: #eee; }
+    .analytics-section .analytic-item { color: #aaa; }
   }
-  .progress-info {
+  
+  .empty-state {
+    background: #1e1e2d;
+    border-color: #333;
     color: #aaa;
+    mat-icon { color: #444; }
   }
 }

@@ -5,30 +5,132 @@
       <mat-icon>add</mat-icon> Add Budget
     </button>
   </div>
-  
-  <div class="budgets-grid" *ngIf="budgets$ | async as budgets">
-    <mat-card class="budget-card" *ngFor="let budget of budgets">
-      <mat-card-header>
-        <mat-card-title>{{ budget.category }}</mat-card-title>
-        <mat-card-subtitle>
-          {{ budget.spent | currency }} / {{ budget.limit | currency }}
-        </mat-card-subtitle>
-      </mat-card-header>
+
+  <!-- Budget Summary Cards -->
+  <div class="summary-grid">
+    <mat-card class="summary-card">
       <mat-card-content>
-        <div class="progress-info">
-          <span>{{ getUtilizationPercentage(budget.spent, budget.limit) | number:'1.0-0' }}% Used</span>
-          <mat-icon *ngIf="getUtilizationPercentage(budget.spent, budget.limit) >= 80" color="warn" matTooltip="Nearing budget limit!">warning</mat-icon>
-        </div>
-        <mat-progress-bar 
-          mode="determinate" 
-          [value]="getUtilizationPercentage(budget.spent, budget.limit)"
-          [color]="getProgressBarColor(budget.spent, budget.limit)">
-        </mat-progress-bar>
+        <div class="title">Total Budget</div>
+        <div class="value">{{ totalBudget | currency }}</div>
       </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="editBudget(budget)">Edit</button>
-        <button mat-button color="warn" (click)="deleteBudget(budget.id)">Delete</button>
-      </mat-card-actions>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="title">Budget Used</div>
+        <div class="value">{{ budgetUsed | currency }}</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="title">Remaining Budget</div>
+        <div class="value">{{ remainingBudget | currency }}</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="title">Utilization</div>
+        <div class="value" [ngClass]="getProgressBarColor(utilizationPercentage)">
+          {{ utilizationPercentage | number:'1.0-0' }}%
+        </div>
+      </mat-card-content>
     </mat-card>
   </div>
+
+  <div class="dashboard-grid">
+    <!-- Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Budget Distribution</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="chart-content">
+        <canvas *ngIf="totalBudget > 0" baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="'doughnut'"></canvas>
+        <div *ngIf="totalBudget === 0" class="empty-chart">No budgets added yet.</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Alerts -->
+    <mat-card class="alerts-card">
+      <mat-card-header>
+        <mat-card-title>Budget Alerts</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="alerts.length === 0" class="no-alerts">
+          <mat-icon>check_circle</mat-icon>
+          <span>All budgets are on track!</span>
+        </div>
+        <div *ngFor="let alert of alerts" class="alert-item">
+          <mat-icon color="warn">warning</mat-icon>
+          <span>{{ alert }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Budget vs Actual Table -->
+  <mat-card>
+    <mat-card-header style="padding: 16px 24px;">
+      <mat-card-title>Budget vs Actual</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ng-container *ngIf="budgetData$ | async as budgets">
+        <table mat-table [dataSource]="budgets" class="mat-elevation-z0">
+          
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef> Category </th>
+            <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="limit">
+            <th mat-header-cell *matHeaderCellDef> Budget </th>
+            <td mat-cell *matCellDef="let element"> {{element.limit | currency}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="spent">
+            <th mat-header-cell *matHeaderCellDef> Spent </th>
+            <td mat-cell *matCellDef="let element"> {{element.spent | currency}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remaining">
+            <th mat-header-cell *matHeaderCellDef> Remaining </th>
+            <td mat-cell *matCellDef="let element"> {{element.remaining | currency}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let element"> 
+              <div class="status-cell">
+                <span class="status-badge" [ngClass]="element.status.toLowerCase().replace(' ', '-')">
+                  {{ element.status }}
+                </span>
+                <mat-progress-bar 
+                  mode="determinate" 
+                  [value]="element.percentage"
+                  [color]="getProgressBarColor(element.percentage)">
+                </mat-progress-bar>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" (click)="editBudget(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteBudget(element.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        
+        <div *ngIf="budgets.length === 0" class="empty-state">
+          No budgets created yet. Click "Add Budget" to get started.
+        </div>
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
 </div>

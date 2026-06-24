@@ -1,0 +1,55 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.settings-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .full-width {
+      width: 100%;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+  }
+}
+
+:host-context(.dark-theme) {
+  .header h1 { color: #eee; }
+  .settings-card {
+    background: #1e1e2d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    color: #eee;
+
+    mat-card-subtitle { color: #aaa; }
+  }
+}

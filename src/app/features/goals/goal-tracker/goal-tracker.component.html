@@ -9,26 +9,57 @@
   <div class="goals-grid" *ngIf="goals$ | async as goals">
     <mat-card class="goal-card" *ngFor="let goal of goals">
       <mat-card-header>
-        <mat-card-title>{{ goal.title }}</mat-card-title>
-        <mat-card-subtitle>
-          Target: {{ goal.targetAmount | currency }} | Deadline: {{ goal.deadline | date }}
-        </mat-card-subtitle>
+        <div class="goal-header-flex">
+          <div class="title-section">
+            <mat-card-title>{{ goal.title }}</mat-card-title>
+            <mat-card-subtitle>
+              Target: {{ goal.targetAmount | currency }} | Deadline: {{ goal.deadline | date:'mediumDate' }}
+            </mat-card-subtitle>
+          </div>
+          <div class="time-badge" [ngClass]="getTimeLeft(goal.deadline) === 'Overdue' ? 'danger' : 'neutral'">
+            {{ getTimeLeft(goal.deadline) }}
+          </div>
+        </div>
       </mat-card-header>
+      
       <mat-card-content>
         <div class="progress-info">
-          <span>{{ goal.currentAmount | currency }} Saved</span>
-          <span>{{ getCompletionPercentage(goal.currentAmount, goal.targetAmount) | number:'1.0-0' }}%</span>
+          <span class="saved-amount">{{ goal.currentAmount | currency }} Saved</span>
+          <span class="percentage" [ngClass]="getProgressBarColor(getCompletionPercentage(goal.currentAmount, goal.targetAmount))">
+            {{ getCompletionPercentage(goal.currentAmount, goal.targetAmount) | number:'1.0-1' }}%
+          </span>
         </div>
+        
         <mat-progress-bar 
           mode="determinate" 
           [value]="getCompletionPercentage(goal.currentAmount, goal.targetAmount)"
-          color="accent">
+          [color]="getProgressBarColor(getCompletionPercentage(goal.currentAmount, goal.targetAmount))">
         </mat-progress-bar>
+
+        <div class="analytics-section">
+          <div class="analytic-item text-muted">
+            <mat-icon>event_available</mat-icon>
+            <span>Projected: {{ getProjectedCompletion(goal) }}</span>
+          </div>
+        </div>
+
+        <div class="alerts-section" *ngIf="getMilestoneAlerts(goal).length > 0">
+          <div class="milestone-alert" *ngFor="let alert of getMilestoneAlerts(goal)">
+            {{ alert }}
+          </div>
+        </div>
+
       </mat-card-content>
+      
       <mat-card-actions align="end">
         <button mat-button color="primary" (click)="editGoal(goal)">Edit</button>
         <button mat-button color="warn" (click)="deleteGoal(goal.id)">Delete</button>
       </mat-card-actions>
     </mat-card>
+
+    <div *ngIf="goals.length === 0" class="empty-state">
+      <mat-icon>savings</mat-icon>
+      <p>You haven't set any savings goals yet. Start saving for your next milestone!</p>
+    </div>
   </div>
 </div>
