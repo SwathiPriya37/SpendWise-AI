@@ -159,7 +159,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 // PUT /api/admin/users/:id/role — Update user role
 export const updateUserRole = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.params.id as string);
     const { role } = req.body;
 
     if (!['USER', 'ADMIN'].includes(role)) {
