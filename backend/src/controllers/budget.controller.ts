@@ -26,6 +26,11 @@ export const createBudget = async (req: AuthRequest, res: Response) => {
         userId: req.userId!
       }
     });
+
+    await prisma.auditLog.create({
+      data: { action: 'BUDGET_CREATED', entity: 'Budget', entityId: budget.id, details: `${category} budget - $${limit}`, userId: req.userId! }
+    });
+
     res.status(201).json(budget);
   } catch (error) {
     res.status(500).json({ message: 'Error creating budget' });
@@ -71,6 +76,11 @@ export const deleteBudget = async (req: AuthRequest, res: Response) => {
     }
 
     await prisma.budget.delete({ where: { id: Number(id) } });
+
+    await prisma.auditLog.create({
+      data: { action: 'BUDGET_DELETED', entity: 'Budget', entityId: Number(id), details: `${budget.category} budget deleted`, userId: req.userId! }
+    });
+
     res.json({ message: 'Budget deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting budget' });

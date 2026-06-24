@@ -39,6 +39,12 @@ export const createExpense = async (req: AuthRequest, res: Response) => {
       },
       include: { tags: true }
     });
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: { action: 'EXPENSE_CREATED', entity: 'Expense', entityId: expense.id, details: `${title} - $${amount}`, userId: req.userId! }
+    });
+
     res.status(201).json(expense);
   } catch (error) {
     res.status(500).json({ message: 'Error creating expense' });
@@ -76,6 +82,11 @@ export const updateExpense = async (req: AuthRequest, res: Response) => {
       },
       include: { tags: true }
     });
+
+    await prisma.auditLog.create({
+      data: { action: 'EXPENSE_UPDATED', entity: 'Expense', entityId: Number(id), details: `${title} updated`, userId: req.userId! }
+    });
+
     res.json(updatedExpense);
   } catch (error) {
     res.status(500).json({ message: 'Error updating expense' });
@@ -93,6 +104,11 @@ export const deleteExpense = async (req: AuthRequest, res: Response) => {
     }
 
     await prisma.expense.delete({ where: { id: Number(id) } });
+
+    await prisma.auditLog.create({
+      data: { action: 'EXPENSE_DELETED', entity: 'Expense', entityId: Number(id), details: `${expense.title} deleted`, userId: req.userId! }
+    });
+
     res.json({ message: 'Expense deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting expense' });

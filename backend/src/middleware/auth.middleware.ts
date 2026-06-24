@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
   userId?: number;
+  user?: { userId: number; role: string };
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -13,8 +14,9 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'spendwise_super_secret_key_2026') as { userId: number };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'spendwise_super_secret_key_2026') as { userId: number; role: string };
     req.userId = decoded.userId;
+    (req as any).user = { userId: decoded.userId, role: decoded.role };
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });

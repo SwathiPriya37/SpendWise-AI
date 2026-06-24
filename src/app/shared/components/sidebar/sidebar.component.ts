@@ -43,6 +43,16 @@ import { inject } from '@angular/core';
           <mat-icon matListItemIcon>description</mat-icon>
           <div matListItemTitle>Reports</div>
         </a>
+        <a mat-list-item routerLink="/settings" routerLinkActive="active">
+          <mat-icon matListItemIcon>settings</mat-icon>
+          <div matListItemTitle>Settings</div>
+        </a>
+
+        <div class="nav-divider" *ngIf="isAdmin"></div>
+        <a mat-list-item routerLink="/admin" routerLinkActive="active" *ngIf="isAdmin" class="admin-link">
+          <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+          <div matListItemTitle>Admin Panel</div>
+        </a>
 
       </mat-nav-list>
 
@@ -216,6 +226,23 @@ import { inject } from '@angular/core';
       color: #d93025 !important;
       cursor: pointer;
     }
+    .nav-divider {
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+      margin: 12px 0;
+    }
+    :host-context(.dark-theme) .nav-divider {
+      background: rgba(255,255,255,0.08);
+    }
+    .admin-link {
+      color: #6366f1 !important;
+    }
+    .admin-link mat-icon {
+      color: #6366f1 !important;
+    }
+    .admin-link.active {
+      background: rgba(99, 102, 241, 0.1) !important;
+    }
     `
   ]
 })
@@ -226,11 +253,15 @@ export class SidebarComponent {
   totalIncome = 3000; // Static base income for now
   totalExpenses = 0;
   savingsRate = 0;
+  isAdmin = false;
 
   constructor() {
     this.expenseService.expenses$.subscribe(expenses => {
       this.totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
       this.calculateSavings();
+    });
+    this.authService.currentUser$.subscribe(user => {
+      this.isAdmin = user?.role === 'ADMIN';
     });
   }
 

@@ -6,6 +6,7 @@ export interface User {
   id: number;
   email: string;
   name: string;
+  role: string;
 }
 
 export interface AuthResponse {
@@ -59,6 +60,15 @@ export class AuthService {
   
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+  isAdmin(): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.role === 'ADMIN';
+  }
+
+  getRole(): string {
+    return this.currentUserSubject.value?.role || 'USER';
   }
 
   updateProfile(data: { name: string }): Observable<{ user: User }> {
